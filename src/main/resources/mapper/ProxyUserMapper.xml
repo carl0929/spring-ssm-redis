@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<!--
+	为这个mapper指定一个唯一的namespace，namespace的值习惯上设置成包名+sql映射文件名，这样就能够保证namespace的值是唯一的
+	例如namespace="me.gacl.mapping.orderMapper"就是me.gacl.mapping(包名)+orderMapper(orderMapper.xml文件去除后缀)
+-->
+<!-- 渠道数据映射 -->
+<mapper namespace="com.trasail.frp.dao.ProxyUserDao">
+
+    <!--通过<resultMap>映射实体类属性名和表的字段名对应关系 -->
+    <resultMap id="proxyUserResultMap" type="com.trasail.frp.entity.ProxyUser" >
+        <!-- 用id属性来映射主键字段 -->
+        <id property="id" column="id" jdbcType="INTEGER" />
+        <!-- 用result属性来映射非主键字段 -->
+        <result property="sName" column="s_name" />
+        <result property="sPwd" column="s_pwd" />
+        <result property="country" column="country" />
+        <result property="userId" column="user_id" />
+        <result property="appName" column="app_name" />
+        <result property="country" column="country" />
+        <result property="op" column="op" />
+        <result property="env" column="env" />
+        <result property="createTime" column="create_time" />
+    </resultMap>
+
+    <!--通过<resultMap>映射实体类属性名和表的字段名对应关系 -->
+    <parameterMap id="proxyUserParamMap" type="com.trasail.frp.entity.ProxyUser" >
+        <!-- 用result属性来映射非主键字段 -->
+        <parameter property="sName" resultMap="proxyUserResultMap" />
+        <parameter property="sPwd" resultMap="proxyUserResultMap" />
+        <parameter property="op" resultMap="proxyUserResultMap" />
+        <parameter property="userId" resultMap="proxyUserResultMap" />
+        <parameter property="appName" resultMap="proxyUserResultMap" />
+        <parameter property="country" resultMap="proxyUserResultMap" />
+        <parameter property="env" resultMap="proxyUserResultMap" />
+        <parameter property="createTime" resultMap="proxyUserResultMap" />
+    </parameterMap>
+
+
+
+    <!-- 插入代理信息 -->
+    <insert id="insertProxyUserInfo"  parameterMap="proxyUserParamMap">
+        insert into ${tableName}
+        (
+        s_name, s_pwd, user_id, app_name, country,
+        op, env, create_time
+        )
+        values
+        (
+        #{info.sName}, #{info.sPwd}, #{info.userId}, #{info.appName},
+        #{info.country}, #{info.op}, #{info.env}, NOW()
+        )
+    </insert>
+
+
+    <update id="updateChanInfoByChanNo" parameterMap="proxyUserParamMap">
+        UPDATE ${tableName} t SET
+        t.chan_desc = #{info.mChanDesc}, t.task_switch = #{info.mTaskSwitchState},
+        t.s_user_max_tasks = #{info.mSingleUserMaxTasks}, t.postback = #{info.mChanPostback}
+        WHERE t.chan_no = #{chanNo}
+    </update>
+
+    <!-- 获取所有渠道信息 -->
+    <select id="getAll" resultMap="proxyUserResultMap">
+        select * from ${tableName}
+    </select>
+
+    <!-- 查询任务开关状态 -->
+    <select id="getChanTaskSwitchState" resultType="Integer">
+        select task_switch from ${tableName}
+        where chan_no=#{chNo}
+    </select>
+
+    <!-- 删除渠道信息 -->
+    <delete id="deleteByIndex" parameterType="int">
+        delete from ${tableName} where _id=#{ind}
+    </delete>
+
+    <!-- 删除渠道信息 -->
+    <delete id="deleteByChNo" parameterType="string">
+        delete from ${tableName} where chan_no=#{chNo}
+    </delete>
+
+</mapper>
